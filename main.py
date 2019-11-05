@@ -1,5 +1,6 @@
 import utils
 
+
 def main():
     connection = utils.open_connection("127.0.0.1", 5432, "postgres", "postgres", "1")
     cur = connection.cursor()
