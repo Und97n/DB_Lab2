@@ -1,7 +1,6 @@
 import psycopg2
 import random
 from psycopg2 import sql
-from prettytable import PrettyTable
 
 
 def open_connection(phost, pport, pdatabase, puser, ppassword):
@@ -71,26 +70,33 @@ def select_all(cursor, table):
 
 
 # Insert some data to table. NO TYPE CHECKS!!!
-def insert_data(connection, cursor, table, data, columns=None):
-    if columns is None:
-        columns = list_table_columns(cursor, table)
-
+def insert_data(connection, cursor, table, data):
     query = sql.SQL("""
-        INSERT INTO {} %s VALUES %s;
+        INSERT INTO {} VALUES %s;
         """).format(sql.Identifier(table))
+
     try:
-        cursor.execute(query, columns, data)
+        cursor.execute(query, (data,))
         connection.commit()
     except BaseException as e:
-        print(str(e))
+        print("ERROR: ", str(e))
+        return False
+    return True
 
 
-def pprint(table_data):
-    x = PrettyTable()
-    x.field_names = table_data[0]
-    for row in table_data[1]:
-        x.add_row(row)
-    print(x)
+# Insert some data to table. NO CHECKS!!!
+def delete_data(connection, cursor, table, condition_string):
+    query = sql.SQL("""
+        DELETE FROM {} WHERE %s;
+        """).format(sql.Identifier(table))
+
+    try:
+        cursor.execute(query, (condition_string,))
+        connection.commit()
+    except BaseException as e:
+        print("ERROR: ", str(e))
+        return False
+    return True
 
 
 def get_full_table(cursor, table):
@@ -112,11 +118,12 @@ def random_string():
 
 
 # Unknown type => None
-def gen_random(type):
-    return {
+def gen_random(type_v):
+    switcher = {
         'integer': lambda: random.randint(0, 2147483647),
-        'text': random_string(),
-    }.get(type, None)
+        'text': lambda: random_string(),
+    }
+    return (switcher.get(type_v, lambda: None))()
 
 
 # Do nothing

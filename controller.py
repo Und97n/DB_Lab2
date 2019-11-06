@@ -15,7 +15,8 @@ class Controller(object):
     def show_main_menu(self):
         self.view.print_start_menu()
 
-        input_v = self.view.request_input("Enter number (from 1 to 4)", valid_cases=['1', '2', '3', '4'])
+        input_v = self.view.request_input("Enter number (from 1 to 4)",
+                                          valid_cases=['1', '2', '3', '4'])
 
         if input_v == "1":
             self.print_tables()
@@ -42,7 +43,7 @@ class Controller(object):
         tables = self.model.list_tables()
         self.view.print_tables(tables)
         input_v = self.view.request_input("Enter number (from 1 to " + str(len(tables)) + "):",
-                                        validator=lambda x: 0 < int(x) <= len(tables))
+                                          validator=lambda x: 0 < int(x) <= len(tables))
         if input_v == "back":
             return None
         self.table_menu(tables[int(input_v)-1])
@@ -50,20 +51,22 @@ class Controller(object):
     def table_menu(self, table_name):
         self.view.print_table_menu(table_name)
         input_v = self.view.request_input("Enter number (from 1 to 7):",
-                                        valid_cases=["1", "2", "3", "4", "5", "6", "7"])
+                                          valid_cases=["1", "2", "3", "4", "5", "6", "7"])
 
         if input_v != "back":
             # SELECT ALL
             if input_v == "1":
                 models = self.model.select_all(table_name)
-                utils.pprint(self.model.get_full_table(table_name))
+                self.view.print_table(self.model.get_full_table(table_name))
+                self.view.print_and_getch("")
                 self.table_menu(table_name)
-            #
-            # # DELETE
-            # if input == "2":
-            #     self.delete_menu(table_name)
-            #     self.view.print_divider(2)
-            #     self.table_controller(table_name)
+
+            # DELETE
+            if input_v == "2":
+                condstr = self.view.request_input("Enter condition(example: 'th_id=12'):\n\t")
+                if condstr != "back":
+                    self.view.after_action_message(self.model.delete_data(table_name, condstr))
+                self.table_menu(table_name)
             #
             # # INSERT
             # if input == "3":
@@ -85,7 +88,7 @@ class Controller(object):
 
             # INSERT RANDOM
             if input_v == "6":
-                self.insert_random(table_name)
+                self.view.after_action_message(self.insert_random(table_name))
                 self.table_menu(table_name)
 
             #FIND

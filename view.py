@@ -1,5 +1,8 @@
+from prettytable import PrettyTable
+import getch
 
 class View(object):
+
     # start menu handler
     def print_start_menu(self):
         print("\n\n::::::::::::::::::::::::::::::::::::::::")
@@ -7,6 +10,13 @@ class View(object):
         print("\t2: SQL Query")
         print("\t3: Find String")
         print("\t4: Exit")
+
+    def print_table(self, table_data):
+        x = PrettyTable()
+        x.field_names = table_data[0]
+        for row in table_data[1]:
+            x.add_row(row)
+        print(x)
 
     # Very nice looking code
     def request_input(self,
@@ -33,18 +43,18 @@ class View(object):
     def print_tables(self, tables_list):
         counter = 1
         for table in tables_list:
-            print(counter, table, sep=": ")
+            print("\t", counter, ": ", table, sep="")
             counter += 1
 
-        print()
-        print("back: Back")
+        print("\tback: Go back")
 
-    # # друкує розмежувач
-    # def print_divider(self, count):
-    #     while count > 0:
-    #         print(divider)
-    #         count -= 1
-    # # друкує меню для таблиці
+    def print_and_getch(self, message):
+        print(message)
+        return getch()
+
+    def after_action_message(self, is_all_ok):
+        return self.print_and_getch(("Ok." if is_all_ok else "FAIL."))
+
     def print_table_menu(self, table_name):
         print("TABLE:", table_name)
         print("\t1: SELECT ALL")
@@ -54,7 +64,7 @@ class View(object):
         print("\t5: SELECT")
         print("\t6: INSERT RANDOM")
         print("\t7: FIND")
-        print("\tback: Back")
+        print("\tback: Go back")
     #
     # # друкує find меню для таблиці
     # def find_menu(self, table_name):
