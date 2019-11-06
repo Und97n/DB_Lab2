@@ -36,7 +36,7 @@ def list_table_columns(cursor, table):
     FROM information_schema.columns
     WHERE table_schema = 'public'
         AND table_name = %s;
-    """, (table, ))
+    """, (table,))
     retval = cursor.fetchall()
     return [x[0] for x in retval]
 
@@ -56,15 +56,43 @@ def get_column_type(cursor, table, column):
         return None
 
 
-def pprint(names, data_frame):
+def select_all(cursor, table):
+    query = sql.SQL("""
+        SELECT * FROM {};
+        """).format(sql.Identifier(table))
+
+    cursor.execute(query)
+    retval = cursor.fetchall()
+    if retval:
+        return retval[0][0]
+    else:
+        return None
+
+
+# Insert some data to table. NO TYPE CHECKS!!!
+def insert_data(connection, cursor, table, data, columns=None):
+    if columns is None:
+        columns = list_table_columns(cursor, table)
+
+    query = sql.SQL("""
+        INSERT INTO {} %s VALUES %s;
+        """).format(sql.Identifier(table))
+    try:
+        cursor.execute(query, columns, data)
+        connection.commit()
+    except BaseException as e:
+        print(str(e))
+
+
+def pprint(table_data):
     x = PrettyTable()
-    x.field_names = names
-    for row in data_frame:
+    x.field_names = table_data[0]
+    for row in table_data[1]:
         x.add_row(row)
     print(x)
 
 
-def print_table(cursor, table):
+def get_full_table(cursor, table):
     columns = list_table_columns(cursor, table)
     query = sql.SQL("""
     SELECT * FROM {};
@@ -72,4 +100,14 @@ def print_table(cursor, table):
 
     cursor.execute(query)
     table = cursor.fetchall()
-    pprint(columns, table)
+    return [columns, table]
+
+
+def gen_random(type):
+    return {
+        'integer'
+    }[type]
+
+
+def do_nothing():
+    return None

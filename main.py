@@ -1,12 +1,16 @@
+from controller import Controller
 import utils
+from model import Model
+from view import View
 
 
 def main():
-    connection = utils.open_connection("127.0.0.1", 5432, "postgres", "postgres", "1")
-    cur = connection.cursor()
-
-    for table in utils.list_tables(cur):
-        utils.print_table(cur, table)
+    enter_host = False
+    enter_password = False
+    controller = Controller(Model((utils.request_input("Enter host:") if enter_host else "127.0.0.1"),
+                                  (utils.request_input("Enter password:")) if enter_password else "1"),
+                            View())
+    controller.start()
 
 
 if __name__ == '__main__':
