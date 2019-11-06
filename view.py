@@ -1,11 +1,16 @@
 from prettytable import PrettyTable
 import getch
+import sys
+
 
 class View(object):
 
+    def print_hello_message(self):
+        print("Hello. You can always type 'back' and 'exit', even if i don't say that. Enjoy.")
+
     # start menu handler
     def print_start_menu(self):
-        print("\n\n::::::::::::::::::::::::::::::::::::::::")
+        print("\n::::::::::::::::::::::::::::::::::::::::")
         print("\t1: View Tables")
         print("\t2: SQL Query")
         print("\t3: Find String")
@@ -37,7 +42,11 @@ class View(object):
             if retval == 'back' or validator(retval):
                 return retval
             else:
-                print(message_on_wrong, end=" ")
+                if retval == 'exit':
+                    print("Bye")
+                    sys.exit(0)
+                else:
+                    print(message_on_wrong, end=" ")
 
     # друкує меню з таблицями
     def print_tables(self, tables_list):
@@ -45,8 +54,6 @@ class View(object):
         for table in tables_list:
             print("\t", counter, ": ", table, sep="")
             counter += 1
-
-        print("\tback: Go back")
 
     def print_and_getch(self, message):
         print(message)
@@ -64,7 +71,6 @@ class View(object):
         print("\t5: SELECT")
         print("\t6: INSERT RANDOM")
         print("\t7: FIND")
-        print("\tback: Go back")
     #
     # # друкує find меню для таблиці
     # def find_menu(self, table_name):

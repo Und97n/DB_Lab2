@@ -120,7 +120,7 @@ def random_string():
 # Unknown type => None
 def gen_random(type_v):
     switcher = {
-        'integer': lambda: random.randint(0, 2147483647),
+        'integer': lambda: random.randint(0, 16387),
         'text': lambda: random_string(),
     }
     return (switcher.get(type_v, lambda: None))()

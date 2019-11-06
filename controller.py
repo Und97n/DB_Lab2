@@ -9,6 +9,7 @@ class Controller(object):
         self.view = view
 
     def start(self):
+        self.view.print_hello_message()
         self.show_main_menu()
 
     # Main menu handler
@@ -63,26 +64,34 @@ class Controller(object):
 
             # DELETE
             if input_v == "2":
-                column = self.view.request_input("Enter field to check(id field is the best choice):")
-                expected_value = self.view.request_input("Enter expected value on this field:")
-                if column != "back" and expected_value != "back":
-                    self.view.after_action_message(self.model.delete_data(table_name, column, expected_value))
-                self.table_menu(table_name)
-            #
-            # # INSERT
-            # if input == "3":
-            #     self.insert_menu(table_name)
-            #     self.view.print_divider(2)
-            #     self.table_controller(table_name)
-            #
+                column = self.view.request_input("\tEnter field to check:")
+                if column != "back":
+                    expected_value = self.view.request_input("\tEnter expected value on this field:")
+                    if expected_value != "back":
+                        self.view.after_action_message(self.model.delete_data(table_name, column, expected_value))
+                    self.table_menu(table_name)
+
+            # INSERT
+            if input_v == "3":
+                def insert():
+                    data_list = []
+                    for column_data in self.model.get_table_columns_data(table_name):
+                        data = self.view.request_input("\tField '" + column_data[0] + "'(" + column_data[1] + "):")
+                        if data != 'back':
+                            data_list.append(data)
+                        else:
+                            return
+                    self.view.after_action_message(self.model.insert_data(table_name, tuple(data_list)))
+                insert()
+
             # # UPDATE
-            # if input == "4":
+            # if input_v == "4":
             #     self.update_menu(table_name)
             #     self.view.print_divider(2)
             #     self.table_controller(table_name)
             #
             # # SELECT
-            # if input == "5":
+            # if input_v == "5":
             #     self.select_menu(table_name)
             #     self.view.print_divider(2)
             #     self.table_controller(table_name)
