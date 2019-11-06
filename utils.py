@@ -85,13 +85,13 @@ def insert_data(connection, cursor, table, data):
 
 
 # Insert some data to table. NO CHECKS!!!
-def delete_data(connection, cursor, table, condition_string):
+def delete_data(connection, cursor, table, column_name, expected_value):
     query = sql.SQL("""
-        DELETE FROM {} WHERE %s;
-        """).format(sql.Identifier(table))
+        DELETE FROM {} WHERE {}=%s;
+        """).format(sql.Identifier(table), sql.Identifier(column_name))
 
     try:
-        cursor.execute(query, (condition_string,))
+        cursor.execute(query, (expected_value,))
         connection.commit()
     except BaseException as e:
         print("ERROR: ", str(e))

@@ -23,6 +23,6 @@ class Model(object):
         print(random_data)
         return utils.insert_data(self.connection, self.cursor, table_name, random_data)
 
-    def delete_data(self, table_name, cond_string):
-        return utils.delete_data(self.connection, self.cursor, table_name, cond_string)
+    def delete_data(self, table_name, column_name, expected_value):
+        return utils.delete_data(self.connection, self.cursor, table_name, column_name, expected_value)
 

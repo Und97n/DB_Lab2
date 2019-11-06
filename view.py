@@ -23,7 +23,7 @@ class View(object):
                       message,
                       valid_cases=[],
                       validator=None,
-                      message_on_wrong="Wrong input, try again(enter 'back' for cancel:"):
+                      message_on_wrong="Wrong input, try again(or enter 'back'):"):
         if validator is None:
             if valid_cases:
                 validator = lambda x: (any(x is s for s in valid_cases))
@@ -50,7 +50,7 @@ class View(object):
 
     def print_and_getch(self, message):
         print(message)
-        return getch()
+        return getch.getch()
 
     def after_action_message(self, is_all_ok):
         return self.print_and_getch(("Ok." if is_all_ok else "FAIL."))

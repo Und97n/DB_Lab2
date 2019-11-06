@@ -63,9 +63,10 @@ class Controller(object):
 
             # DELETE
             if input_v == "2":
-                condstr = self.view.request_input("Enter condition(example: 'th_id=12'):\n\t")
-                if condstr != "back":
-                    self.view.after_action_message(self.model.delete_data(table_name, condstr))
+                column = self.view.request_input("Enter field to check(id field is the best choice):")
+                expected_value = self.view.request_input("Enter expected value on this field:")
+                if column != "back" and expected_value != "back":
+                    self.view.after_action_message(self.model.delete_data(table_name, column, expected_value))
                 self.table_menu(table_name)
             #
             # # INSERT
