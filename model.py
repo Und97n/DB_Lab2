@@ -17,8 +17,8 @@ class Model(object):
         return utils.get_full_table(self.cursor, table_name)
 
     def insert_random(self, table_name):
-        random_item = randomizer.generate_random_item(database_helper.get_table_object(table_name))
-        result = database_helper.insert_item(connection, cursor, table_name, random_item)
-        database_helper.close_database_connection(connection, cursor)
-        return result
+        def gen_rand_data(x):
+            utils.gen_random(utils.get_column_type(self.cursor, table_name, x))
+        random_data = map(gen_rand_data, (utils.list_table_columns(self.cursor, table_name)))
+        return utils.insert_data(self.connection, self.cursor, table_name, random_data)
 

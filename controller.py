@@ -86,7 +86,6 @@ class Controller(object):
             # INSERT RANDOM
             if input_v == "6":
                 self.insert_random(table_name)
-                self.view.print_divider(2)
                 self.table_menu(table_name)
 
             #FIND

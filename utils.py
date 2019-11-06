@@ -1,4 +1,5 @@
 import psycopg2
+import random
 from psycopg2 import sql
 from prettytable import PrettyTable
 
@@ -103,11 +104,21 @@ def get_full_table(cursor, table):
     return [columns, table]
 
 
+def random_string():
+    random_str = ""
+    for i in range(0, random.randint(0, 30)):
+        random_str += str(random.choice("0123456789abcdefghijklmnopqrstuvwxyz"))
+    return random_str
+
+
+# Unknown type => None
 def gen_random(type):
     return {
-        'integer'
-    }[type]
+        'integer': lambda: random.randint(0, 2147483647),
+        'text': random_string(),
+    }.get(type, None)
 
 
+# Do nothing
 def do_nothing():
     return None
