@@ -71,11 +71,11 @@ def select_all(cursor, table):
 
 def select_some(cursor, table, column_to_check, expected_column_value):
     query = sql.SQL("""
-        SELECT * FROM {} WHERE %s=%s;
-        """).format(sql.Identifier(table))
+        SELECT * FROM {} WHERE {}=%s;
+        """).format(sql.Identifier(table), sql.Identifier(column_to_check))
 
     try:
-        cursor.execute(query, (column_to_check, expected_column_value))
+        cursor.execute(query, (expected_column_value))
         retval = cursor.fetchall()
 
         if retval:
