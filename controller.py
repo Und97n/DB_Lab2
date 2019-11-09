@@ -44,7 +44,7 @@ class Controller(object):
         tables = self.model.list_tables()
         self.view.print_tables(tables)
         input_v = self.view.request_input("Enter number (from 1 to " + str(len(tables)) + "):",
-                                          validator=lambda x: 0 < int(x) <= len(tables))
+                                          validator=lambda x: x.isdigit() and 0 < int(x) <= len(tables))
         if input_v == "back":
             return None
         self.table_menu(tables[int(input_v)-1])
@@ -65,7 +65,6 @@ class Controller(object):
         if input_v != "back":
             # SELECT ALL
             if input_v == "1":
-                models = self.model.select_all(table_name)
                 self.view.print_table(self.model.get_full_table(table_name))
                 self.view.print_and_getch("")
                 self.table_menu(table_name)
@@ -81,12 +80,16 @@ class Controller(object):
             if input_v == "3":
                 def insert():
                     data_list = []
+                    print("You can enter nothing for random value.")
                     for column_data in self.model.get_table_columns_data(table_name):
                         data = self.view.request_input("\tField '" + column_data[0] + "'(" + column_data[1] + "):")
-                        if data != 'back':
-                            data_list.append(data)
-                        else:
+                        if data == 'back':
                             return
+                        elif data == '':
+                            data_list.append(utils.gen_random(column_data[1]))
+                        else:
+                            data_list.append(data)
+
                     self.view.after_action_message(self.model.insert_data(table_name, tuple(data_list)))
                 insert()
                 self.table_menu(table_name)
@@ -102,48 +105,45 @@ class Controller(object):
                 column, value = self.select_obj_menu()
                 if column and value:
                     data = self.model.select_some(table_name, column, value)
-                    self.view.print_table(data, "NOTHING FOUND")
+                    self.view.print_table(data, on_none_message="NOTHING FOUND")
                     self.view.after_action_message(data)
                 self.table_menu(table_name)
 
             # INSERT RANDOM
             if input_v == "6":
-                self.view.after_action_message(self.insert_random(table_name))
+                self.view.after_action_message(self.model.insert_random(table_name))
                 self.table_menu(table_name)
 
             #FIND
             # if input == "7":
             #     self.find_menu(table_name)
 
-    # handler random insert
-    def insert_random(self, table_name):
-        self.model.insert_random(table_name)
 
-    # # handler find
-    # def find_menu(self, table_name):
-    #     self.view.find_menu(table_name)
-    #
-    #     if table_name == constants.book_table or table_name == constants.author_table or table_name == constants.reader_table:
-    #         input = self.view.request_input("Enter number (from 1 to 4)")
-    #         is_valid = validate_input(input, ["1","2","3","4"])
-    #
-    #         if is_valid:
-    #             if table_name == constants.reader_table:
-    #                 self.reader_find_menu(input)
-    #
-    #             if table_name == constants.book_table:
-    #                 self.book_find_menu(input)
-    #
-    #             if table_name == constants.author_table:
-    #                 self.author_find_menu(input)
-    #
-    #             self.table_controller(table_name)
-    #
-    #     else:
-    #         input = self.view.request_input("", True)
-    #         is_valid = validate_input(input, ["1"])
-    #         if is_valid:
-    #             self.table_controller(table_name)
+    # handler find
+    def find_menu(self, table_name):
+        self.view.find_menu(table_name)
+
+        if table_name == constants.book_table or table_name == constants.author_table or table_name == constants.reader_table:
+            input = self.view.request_input("Enter number (from 1 to 4)")
+            is_valid = validate_input(input, ["1","2","3","4"])
+
+            if is_valid:
+                if table_name == constants.reader_table:
+                    self.reader_find_menu(input)
+
+                if table_name == constants.book_table:
+                    self.book_find_menu(input)
+
+                if table_name == constants.author_table:
+                    self.author_find_menu(input)
+
+                self.table_controller(table_name)
+
+        else:
+            input = self.view.request_input("", True)
+            is_valid = validate_input(input, ["1"])
+            if is_valid:
+                self.table_controller(table_name)
 
     # # find handler для таблиці reader
     # def reader_find_menu(self, input):

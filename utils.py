@@ -75,11 +75,10 @@ def select_some(cursor, table, column_to_check, expected_column_value):
         """).format(sql.Identifier(table), sql.Identifier(column_to_check))
 
     try:
-        cursor.execute(query, (expected_column_value))
+        cursor.execute(query, (expected_column_value,))
         retval = cursor.fetchall()
-
         if retval:
-            return retval[0][0]
+            return [list_table_columns(cursor, table), retval]
         else:
             return None
     except BaseException as e:
@@ -130,7 +129,7 @@ def get_full_table(cursor, table):
 
 def random_string():
     random_str = ""
-    for i in range(0, random.randint(0, 30)):
+    for i in range(0, random.randint(5, 10)):
         random_str += str(random.choice("0123456789abcdefghijklmnopqrstuvwxyz"))
     return random_str
 
@@ -138,11 +137,37 @@ def random_string():
 # Unknown type => None
 def gen_random(type_v):
     switcher = {
-        'integer': lambda: random.randint(0, 16387),
-        'text': lambda: random_string(),
+        'integer':
+            lambda: random.randint(0, 16387),
+        'text':
+            lambda: random_string(),
+        'bigint':
+            lambda: random.randint(0, 16387),
+        'boolean':
+            lambda: random.choice(['true', 'false']),
+        'timestamp with time zone':
+            # 2019-08-21 08:30:00+03:00
+            lambda: "%04d-%02d-%02d %02d:%02d:%02d+%02d:00" %
+                    (random.randint(1970, 2037),  # year
+                     random.randint(1, 12),  # month
+                     random.randint(1, 28),  # day
+                     random.randint(0, 23),  # hour
+                     random.randint(0, 59),  # minute
+                     random.randint(0, 59),  # second
+                     random.randint(0, 11),  # timezone
+                     ),
     }
     return (switcher.get(type_v, lambda: None))()
 
+
+#
+# def parse_from_string(str, type_v):
+#     switcher = {
+#         'integer': lambda: int(str),
+#         'text': lambda: str,
+#     }
+#     return (switcher.get(type_v, lambda: None))()
+#
 
 # Do nothing
 def do_nothing():
