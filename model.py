@@ -12,6 +12,11 @@ class Model(object):
             with conn.cursor() as cursor:
                 return utils.select_all(cursor, table_name)
 
+    def select_some(self, table_name, column, value):
+        with self.open_connection() as conn:
+            with conn.cursor() as cursor:
+                return utils.select_some(cursor, table_name, column, value)
+
     def list_tables(self):
         with self.open_connection() as conn:
             with conn.cursor() as cursor:

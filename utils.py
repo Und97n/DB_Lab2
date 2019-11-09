@@ -69,6 +69,24 @@ def select_all(cursor, table):
         return None
 
 
+def select_some(cursor, table, column_to_check, expected_column_value):
+    query = sql.SQL("""
+        SELECT * FROM {} WHERE %s=%s;
+        """).format(sql.Identifier(table))
+
+    try:
+        cursor.execute(query, (column_to_check, expected_column_value))
+        retval = cursor.fetchall()
+
+        if retval:
+            return retval[0][0]
+        else:
+            return None
+    except BaseException as e:
+        print("ERROR: ", str(e))
+        return False
+
+
 # Insert some data to table. NO TYPE CHECKS!!!
 def insert_data(connection, cursor, table, data):
     query = sql.SQL("""
@@ -128,4 +146,4 @@ def gen_random(type_v):
 
 # Do nothing
 def do_nothing():
-    return None
+    return None  # do nothing

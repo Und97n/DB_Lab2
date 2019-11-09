@@ -16,12 +16,15 @@ class View(object):
         print("\t3: Find String")
         print("\t4: Exit")
 
-    def print_table(self, table_data):
-        x = PrettyTable()
-        x.field_names = table_data[0]
-        for row in table_data[1]:
-            x.add_row(row)
-        print(x)
+    def print_table(self, table_data, on_none_message=None):
+        if table_data:
+            x = PrettyTable()
+            x.field_names = table_data[0]
+            for row in table_data[1]:
+                x.add_row(row)
+            print(x)
+        elif on_none_message:
+            print(on_none_message)
 
     # Very nice looking code
     def request_input(self,
@@ -64,13 +67,13 @@ class View(object):
 
     def print_table_menu(self, table_name):
         print("TABLE:", table_name)
-        print("\t1: SELECT ALL")
-        print("\t2: DELETE")
-        print("\t3: INSERT")
-        print("\t4: UPDATE")
-        print("\t5: SELECT")
-        print("\t6: INSERT RANDOM")
-        print("\t7: FIND")
+        print("\t1: Select all")
+        print("\t2: Delete")
+        print("\t3: Insert")
+        print("\t4: Update")
+        print("\t5: Select some")
+        print("\t6: Insert random data")
+        print("\t7: Find")
     #
     # # друкує find меню для таблиці
     # def find_menu(self, table_name):

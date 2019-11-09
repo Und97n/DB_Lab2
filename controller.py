@@ -49,6 +49,14 @@ class Controller(object):
             return None
         self.table_menu(tables[int(input_v)-1])
 
+    def select_obj_menu(self):
+        column = self.view.request_input("\tEnter field to check:")
+        if column != "back" and column != "":
+            expected_value = self.view.request_input("\tEnter expected value on this field:")
+            if expected_value != "back":
+                return column, expected_value
+        return None, None
+
     def table_menu(self, table_name):
         self.view.print_table_menu(table_name)
         input_v = self.view.request_input("Enter number (from 1 to 7):",
@@ -64,12 +72,10 @@ class Controller(object):
 
             # DELETE
             if input_v == "2":
-                column = self.view.request_input("\tEnter field to check:")
-                if column != "back":
-                    expected_value = self.view.request_input("\tEnter expected value on this field:")
-                    if expected_value != "back":
-                        self.view.after_action_message(self.model.delete_data(table_name, column, expected_value))
-                    self.table_menu(table_name)
+                column, value = self.select_obj_menu()
+                if column and value:
+                    self.view.after_action_message(self.model.delete_data(table_name, column, value))
+                self.table_menu(table_name)
 
             # INSERT
             if input_v == "3":
@@ -83,6 +89,7 @@ class Controller(object):
                             return
                     self.view.after_action_message(self.model.insert_data(table_name, tuple(data_list)))
                 insert()
+                self.table_menu(table_name)
 
             # # UPDATE
             # if input_v == "4":
@@ -90,11 +97,14 @@ class Controller(object):
             #     self.view.print_divider(2)
             #     self.table_controller(table_name)
             #
-            # # SELECT
-            # if input_v == "5":
-            #     self.select_menu(table_name)
-            #     self.view.print_divider(2)
-            #     self.table_controller(table_name)
+            # SELECT
+            if input_v == "5":
+                column, value = self.select_obj_menu()
+                if column and value:
+                    data = self.model.select_some(table_name, column, value)
+                    self.view.print_table(data, "NOTHING FOUND")
+                    self.view.after_action_message(data)
+                self.table_menu(table_name)
 
             # INSERT RANDOM
             if input_v == "6":
