@@ -105,7 +105,7 @@ def gen_random(type_v):
         'boolean':
             lambda: random.choice(['true', 'false']),
         'timestamp with time zone':
-        # 2019-08-21 08:30:00+03:00
+            # 2019-08-21 08:30:00+03:00
             lambda: "%04d-%02d-%02d %02d:%02d:%02d+%02d:00" %
                     (random.randint(1970, 2037),  # year
                      random.randint(1, 12),  # month

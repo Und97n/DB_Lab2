@@ -25,19 +25,11 @@ class Controller(object):
 
         if input_v == "2":
             sql_query = self.view.request_input("Enter query:")
-            print(self.model.query(sql_query))
+            self.view.print_data(self.model.query(sql_query), on_none_message="NOTHING")
             self.show_main_menu()
-        #
-        # if input == "3":
-        #     string = self.view.request_input("String to find: ")
-        #     self.model.find_no_string_in_all_tables(string)
 
-        if input_v == "4":
-            utils.do_nothing()
-
-        if input_v == "back":
-            utils.do_nothing()
-            self.show_main_menu()
+        if input_v == "3":
+            self.find_menu()
 
     # handler меню таблиць
     def print_tables(self):
@@ -114,6 +106,47 @@ class Controller(object):
             if input_v == "6":
                 self.view.after_action_message(self.model.insert_random(table_name))
                 self.table_menu(table_name)
+
+    def find_menu(self):
+        self.view.find_menu()
+        input_v = self.view.request_input("Enter number (from 1 to 4):",
+                                          valid_cases=["1", "2", "3", "4"])
+        if input_v != 'back':
+            if input_v == '1':
+                data = self.view.request_input("Enter 'adblock_using' param(boolean):")
+                if data != 'back' and data:
+                    data = data.lower()
+                    if data != 'true' and data != 'false' and data != 'none' and data != 'null':
+                        print(data, "isn't bool")
+                    else:
+                        val = self.model.find_1((data == 'true') if data == 'true' or data == 'false' else None)
+                        self.view.print_table(val, on_none_message="NOTHING FOUND")
+                        self.view.after_action_message(val)
+
+            if input_v == '2':
+                data = self.view.request_input("Enter word(text):")
+                if data != 'back' and data:
+                    val = self.model.find_2(data)
+                    self.view.print_table(val, on_none_message="NOTHING FOUND")
+                    self.view.after_action_message(val)
+
+            if input_v == '3':
+                data_s = self.view.request_input("Enter start_time param(timestamp with time zone):")
+                if data_s != 'back' and data_s:
+                    data_e = self.view.request_input("Enter start_time param(timestamp with time zone):")
+                    if data_e != 'back' and data_e:
+                        val = self.model.find_3(data_s, data_e)
+                        self.view.print_table(val, on_none_message="NOTHING FOUND")
+                        self.view.after_action_message(val)
+
+            if input_v == '4':
+                data = self.view.request_input("Enter word param(text):")
+                if data != 'back' and data:
+                    val = self.model.find_4(data)
+                    self.view.print_table(val, on_none_message="NOTHING FOUND")
+                    self.view.after_action_message(val)
+
+            self.find_menu()
 
     # update handler для таблиці
     def update_menu(self, table_name):

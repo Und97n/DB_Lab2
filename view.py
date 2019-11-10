@@ -13,13 +13,23 @@ class View(object):
         print("\n::::::::::::::::::::::::::::::::::::::::")
         print("\t1: View Tables")
         print("\t2: SQL Query")
-        print("\t3: Find String")
+        print("\t3: Find some")
         print("\t4: Exit")
+
+    def print_data(self, table_data, on_none_message=None):
+        if table_data:
+            x = PrettyTable()
+            for row in table_data:
+                x.add_row(row)
+            print(x)
+        elif on_none_message:
+            print(on_none_message)
 
     def print_table(self, table_data, on_none_message=None):
         if table_data:
             x = PrettyTable()
             x.field_names = table_data[0]
+
             for row in table_data[1]:
                 x.add_row(row)
             print(x)
@@ -41,15 +51,21 @@ class View(object):
         retval = None
         print(message, end=" ")
         while True:
-            retval = input()
-            if retval == 'back' or validator(retval):
-                return retval
-            else:
-                if retval == 'exit':
-                    print("Bye")
-                    sys.exit(0)
+            try:
+                retval = input()
+                if retval == 'back' or validator(retval):
+                    return retval
                 else:
-                    print(message_on_wrong, end=" ")
+                    if retval == 'exit':
+                        print("Bye")
+                        sys.exit(0)
+                    else:
+                        print(message_on_wrong, end=" ")
+            except KeyboardInterrupt:
+                print("\nInterrupted by user")
+                sys.exit()
+            except Exception as e:
+                print("Error on input:", e)
 
     # друкує меню з таблицями
     def print_tables(self, tables_list):
@@ -74,74 +90,11 @@ class View(object):
         print("\t5: Select where")
         print("\t6: Insert random data")
         print("\t7: Find")
-    #
-    # # друкує find меню для таблиці
-    # def find_menu(self, table_name):
-    #     if table_name == constants.author_table:
-    #         print("1. FIND ALL AUTHOR BOOKS")
-    #         print("2. FIND ALL READERS THAT READING AUTHOR BOOKS")
-    #         print("3. FIND READER'S PHONES THAT READ AUTHOR BOOKS")
-    #         print()
-    #         print("4. Back")
-    #         return
-    #     if table_name == constants.reader_table:
-    #         print("1. FIND ALL READERS WITH PREMIUM SUBSCRIPTION")
-    #         print("2. FIND ALL READERS WITH SUBSCRIPTION WITH PARTICULAR DATE")
-    #         print("3. FIND ALL BOOKS THAT REDEAR READ")
-    #         print()
-    #         print("4. Back")
-    #         return
-    #     if table_name == constants.book_table:
-    #         print("1. FIND ALL READERS THAT READ BOOK")
-    #         print("2. FIND ALL AUTHORS THAT WROTE BOOK")
-    #         print("3. FIND ALL READERS THAT READ AND WITH PARTICULAR SUBSCRIPTION")
-    #         print()
-    #         print("4. Back")
-    #         return
-    #     print("1. Back")
-    #
-    # # друкує атрибути об'єкта
-    # def print_object_keys_menu(self, object_keys):
-    #     index = 0
-    #     for object_key in object_keys:
-    #         index += 1
-    #         print(str(index) + ". " + str(object_key))
-    #
-    #     print()
-    #     print(str(index + 1) + ". Back")
-    #
-    # # запит на ввод об'єкта користувачем
-    # def request_input_object(self, obj, full_input = False, formating = True):
-    #     index = 0
-    #     new_obj = {}
-    #     for key in obj.keys():
-    #         if not full_input and index == 0:
-    #             index += 1
-    #             continue
-    #
-    #         print(key + " = ")
-    #         key_input = self.request_input("", True)
-    #         if formating:
-    #             new_obj[key] = self.fromat_key(key_input, obj[key])
-    #         else:
-    #             new_obj[key] = key_input
-    #     return new_obj
-    #
-    # # TODO FIX IT!!!
-    # # формування дефотлних значень для об'єкта (для майбутньої валідації)
-    # def fromat_key(self, key, key_type):
-    #     if key_type == 'integer':
-    #         try:
-    #             return int(key)
-    #         except ValueError:
-    #             return None
-    #     if key_type == 'text':
-    #         return "'" + str(key) + "'"
-    #     if key_type == 'timestamp':
-    #         return "'" + str(key) + "'"
-    #     if key_type == 'bool':
-    #        if key == '':
-    #            return None
-    #        else:
-    #            return key
-    #
+
+    # друкує find меню для таблиці
+    def find_menu(self):
+        print("FIND MENU")
+        print("\t1: Users, who used/not-used adblock at last session")
+        print("\t2: Themes, that are connected with product, that contains word in name")
+        print("\t3: Users, who have last session in time period")
+        print("\t4: Ads, whose promotes don't have word in registration place")
