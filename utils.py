@@ -14,86 +14,56 @@ def get_cursor(connection):
     return connection.cursor()
 
 
-def close_connection(connection, cursor):
-    if connection is not None:
-        cursor.close()
-        connection.close()
-        print("З'єднання з PostgreSQL закрите")
+def query(cursor, q, query_params):
+    try:
+        cursor.execute(q, query_params)
+        retval = cursor.fetchall()
+        if retval:
+            return retval
+    except BaseException as e:
+        print("ERROR: ", str(e))
 
 
 def list_tables(cursor):
-    cursor.execute("""
+    data = query(cursor, """
     SELECT table_name FROM information_schema.tables 
     WHERE table_schema = 'public';
-    """)
-    retval = cursor.fetchall()
-    return [x[0] for x in retval]
+    """, ())
+    if data:
+        return [x[0] for x in data]
 
 
 def list_table_columns(cursor, table):
-    cursor.execute("""
+    data = query(cursor, """
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = 'public'
         AND table_name = %s;
     """, (table,))
-    retval = cursor.fetchall()
-    return [x[0] for x in retval]
+    if data:
+        return [x[0] for x in data]
 
 
 def get_column_type(cursor, table, column):
-    cursor.execute("""
+    data = query(cursor, """
     SELECT data_type
     FROM information_schema.columns
     WHERE table_schema = 'public'
         AND table_name = %s
         AND column_name = %s;
     """, (table, column))
-    retval = cursor.fetchall()
-    if retval:
-        return retval[0][0]
-    else:
-        return None
-
-
-def select_all(cursor, table):
-    query = sql.SQL("""
-        SELECT * FROM {};
-        """).format(sql.Identifier(table))
-
-    cursor.execute(query)
-    retval = cursor.fetchall()
-    if retval:
-        return retval[0][0]
-    else:
-        return None
-
-
-def select_some(cursor, table, column_to_check, expected_column_value):
-    query = sql.SQL("""
-        SELECT * FROM {} WHERE {}=%s;
-        """).format(sql.Identifier(table), sql.Identifier(column_to_check))
-
-    try:
-        cursor.execute(query, (expected_column_value,))
-        retval = cursor.fetchall()
-        if retval:
-            return [list_table_columns(cursor, table), retval]
-        else:
-            return None
-    except BaseException as e:
-        print("ERROR: ", str(e))
-        return False
+    if data:
+        return data[0][0]
 
 
 # Insert some data to table. NO TYPE CHECKS!!!
 def insert_data(connection, cursor, table, data):
-    query = sql.SQL("""
+    q = sql.SQL("""
         INSERT INTO {} VALUES %s;
         """).format(sql.Identifier(table))
 
     try:
-        cursor.execute(query, (data,))
+        cursor.execute(q, (data,))
         connection.commit()
     except BaseException as e:
         print("ERROR: ", str(e))
@@ -103,28 +73,17 @@ def insert_data(connection, cursor, table, data):
 
 # Insert some data to table. NO CHECKS!!!
 def delete_data(connection, cursor, table, column_name, expected_value):
-    query = sql.SQL("""
+    q = sql.SQL("""
         DELETE FROM {} WHERE {}=%s;
         """).format(sql.Identifier(table), sql.Identifier(column_name))
 
     try:
-        cursor.execute(query, (expected_value,))
+        cursor.execute(q, (expected_value,))
         connection.commit()
     except BaseException as e:
         print("ERROR: ", str(e))
         return False
     return True
-
-
-def get_full_table(cursor, table):
-    columns = list_table_columns(cursor, table)
-    query = sql.SQL("""
-    SELECT * FROM {};
-    """).format(sql.Identifier(table))
-
-    cursor.execute(query)
-    table = cursor.fetchall()
-    return [columns, table]
 
 
 def random_string():
@@ -146,7 +105,7 @@ def gen_random(type_v):
         'boolean':
             lambda: random.choice(['true', 'false']),
         'timestamp with time zone':
-            # 2019-08-21 08:30:00+03:00
+        # 2019-08-21 08:30:00+03:00
             lambda: "%04d-%02d-%02d %02d:%02d:%02d+%02d:00" %
                     (random.randint(1970, 2037),  # year
                      random.randint(1, 12),  # month
@@ -159,15 +118,6 @@ def gen_random(type_v):
     }
     return (switcher.get(type_v, lambda: None))()
 
-
-#
-# def parse_from_string(str, type_v):
-#     switcher = {
-#         'integer': lambda: int(str),
-#         'text': lambda: str,
-#     }
-#     return (switcher.get(type_v, lambda: None))()
-#
 
 # Do nothing
 def do_nothing():

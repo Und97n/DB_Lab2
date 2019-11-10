@@ -63,7 +63,7 @@ class View(object):
         return getch.getch()
 
     def after_action_message(self, is_all_ok):
-        return self.print_and_getch(("Ok." if is_all_ok else "FAIL."))
+        return self.print_and_getch("Ok" if is_all_ok else "FAIL")
 
     def print_table_menu(self, table_name):
         print("TABLE:", table_name)
@@ -71,7 +71,7 @@ class View(object):
         print("\t2: Delete")
         print("\t3: Insert")
         print("\t4: Update")
-        print("\t5: Select some")
+        print("\t5: Select where")
         print("\t6: Insert random data")
         print("\t7: Find")
     #

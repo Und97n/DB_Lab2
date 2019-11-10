@@ -1,5 +1,6 @@
 import utils as utils
 import psycopg2
+from psycopg2 import sql
 
 
 class Model(object):
@@ -7,15 +8,14 @@ class Model(object):
     def __init__(self, host, password):
         self.open_connection = lambda: utils.open_connection(host, 5432, "postgres", "postgres", password)
 
-    def select_all(self, table_name):
-        with self.open_connection() as conn:
-            with conn.cursor() as cursor:
-                return utils.select_all(cursor, table_name)
-
     def select_some(self, table_name, column, value):
         with self.open_connection() as conn:
             with conn.cursor() as cursor:
-                return utils.select_some(cursor, table_name, column, value)
+                data = utils.query(cursor, sql.SQL("""
+                        SELECT * FROM {} WHERE {}=%s;
+                        """).format(sql.Identifier(table_name), sql.Identifier(column)), (value,))
+                if data:
+                    return [utils.list_table_columns(cursor, table_name), data]
 
     def list_tables(self):
         with self.open_connection() as conn:
@@ -25,7 +25,13 @@ class Model(object):
     def get_full_table(self, table_name):
         with self.open_connection() as conn:
             with conn.cursor() as cursor:
-                return utils.get_full_table(cursor, table_name)
+                columns = utils.list_table_columns(cursor, table_name)
+                data = utils.query(cursor, sql.SQL("""
+                    SELECT * FROM {};
+                    """).format(sql.Identifier(table_name)), ())
+
+                if columns and data:
+                    return [columns, data]
 
     def insert_random(self, table_name):
         with self.open_connection() as connection:
