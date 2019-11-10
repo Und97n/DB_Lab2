@@ -83,7 +83,7 @@ class Model(object):
                 SELECT theme.* FROM theme 
                 JOIN ad ON ad_theme=th_id 
                 JOIN product ON ad_product=prd_id
-                WHERE prd_name @@ %s
+                WHERE to_tsvector(prd_name) @@ to_tsquery(%s)
                 GROUP BY th_id;
                 """, (prd_name_contains,))
                 if data:
@@ -108,7 +108,7 @@ class Model(object):
                 data = utils.query(cursor, """
                 SELECT ad.* FROM ad 
                 JOIN promoter ON ad_promoter=pr_id 
-                WHERE NOT (pr_regplace @@ %s);
+                WHERE NOT (to_tsvector(pr_regplace) @@ to_tsquery(%s));
                 """, (not_contains_word, ))
                 if data:
                     return [utils.list_table_columns(cursor, 'ad'), data]
