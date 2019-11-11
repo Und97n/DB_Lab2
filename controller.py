@@ -16,7 +16,7 @@ class Controller(object):
     def show_main_menu(self):
         self.view.print_start_menu()
 
-        input_v = self.view.request_input("Enter number (from 1 to 4):",
+        input_v = self.view.request_input("Enter number (from 1 to 5):",
                                           valid_cases=['1', '2', '3', '4', '5'])
 
         if input_v == "1":
@@ -39,6 +39,7 @@ class Controller(object):
                 self.view.print_table(self.model.find_by_phraze(table, phraze), "NOTHING")
             self.show_main_menu()
 
+    # Ask user to enter fields values of some object. Return None if problems
     def request_input_object(self, table_name, message="You can enter nothing for random value.", random_on_none=True):
         data_list = []
         print(message)
@@ -52,6 +53,7 @@ class Controller(object):
                 data_list.append(data)
         return data_list
 
+    # Select table menu
     def print_tables(self):
         tables = self.model.list_tables()
         self.view.print_tables(tables)
@@ -61,6 +63,7 @@ class Controller(object):
             return None
         self.table_menu(tables[int(input_v) - 1])
 
+    # Ask user to select some field of table and expected value on this field(for SELECT's)
     def select_obj_menu(self, table_name):
         columns = self.model.list_columns(table_name)
         self.view.select_column_menu(table_name, columns)
@@ -73,9 +76,10 @@ class Controller(object):
                 return column, expected_value
         return None, None
 
+    # What can you do with table?
     def table_menu(self, table_name):
         self.view.print_table_menu(table_name)
-        input_v = self.view.request_input("Enter number (from 1 to 7):",
+        input_v = self.view.request_input("Enter number (from 1 to 6):",
                                           valid_cases=["1", "2", "3", "4", "5", "6"])
 
         if input_v != "back":
@@ -121,6 +125,19 @@ class Controller(object):
                 self.view.after_action_message(self.model.insert_random(table_name))
                 self.table_menu(table_name)
 
+    # Update menu
+    def update_menu(self, table_name):
+        print("SELECT OBJECT TO UPDATE:")
+        c, v = self.select_obj_menu(table_name)
+        if c and v:
+            obj = self.request_input_object(table_name, "Enter nothing for not touching field", False)
+            if obj:
+                self.view.after_action_message(self.model.update(table_name, c, v, obj))
+
+
+    # TABLE DEPENDENCY ZONE
+
+    # Just find menu
     def find_menu(self):
         self.view.find_menu()
         input_v = self.view.request_input("Enter number (from 1 to 4):",
@@ -161,12 +178,3 @@ class Controller(object):
                     self.view.after_action_message(val)
 
             self.find_menu()
-
-    # update handler для таблиці
-    def update_menu(self, table_name):
-        print("SELECT OBJECT TO UPDATE:")
-        c, v = self.select_obj_menu(table_name)
-        if c and v:
-            obj = self.request_input_object(table_name, "Enter nothing for not touching field", False)
-            if obj:
-                self.view.after_action_message(self.model.update(table_name, c, v, obj))

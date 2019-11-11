@@ -3,6 +3,7 @@ import random
 from psycopg2 import sql
 
 
+# Connect to psql database
 def open_connection(phost, pport, pdatabase, puser, ppassword):
     try:
         return psycopg2.connect(host=phost, port=pport, database=pdatabase, user=puser, password=ppassword)
@@ -10,10 +11,7 @@ def open_connection(phost, pport, pdatabase, puser, ppassword):
         print("Error: connection with PostgreSQL\n\t", error)
 
 
-def get_cursor(connection):
-    return connection.cursor()
-
-
+# Execute query and get result. If error - print exception
 def query(cursor, q, query_params):
     try:
         cursor.execute(q, query_params)
@@ -24,6 +22,7 @@ def query(cursor, q, query_params):
         print("ERROR: ", str(e))
 
 
+# Get list of tables in database
 def list_tables(cursor):
     data = query(cursor, """
     SELECT table_name FROM information_schema.tables 
@@ -33,6 +32,7 @@ def list_tables(cursor):
         return [x[0] for x in data]
 
 
+# Get list of columns for some table in database
 def list_table_columns(cursor, table):
     data = query(cursor, """
     SELECT column_name
@@ -44,6 +44,7 @@ def list_table_columns(cursor, table):
         return [x[0] for x in data]
 
 
+# Get type of column(integer, text, etc.)
 def get_column_type(cursor, table, column):
     data = query(cursor, """
     SELECT data_type
@@ -71,6 +72,8 @@ def insert_data(connection, cursor, table, data):
     return True
 
 
+# Update item in table. Selection of item is done with selection of some value in some field.
+# New data passed through list with strings. If string is empty - don't update that field.
 def update_item(connection, cursor, table_name, column_to_check, expected_value, new_data):
     columns = list_table_columns(cursor, table_name)
     insert_str = ""
@@ -94,7 +97,8 @@ def update_item(connection, cursor, table_name, column_to_check, expected_value,
     return True
 
 
-# Insert some data to table. NO CHECKS!!!
+# Insert some data to table. Selection of item is done with selection of some value in some field.
+# NO CHECKS!!!
 def delete_data(connection, cursor, table, column_name, expected_value):
     q = sql.SQL("""
         DELETE FROM {} WHERE {}=%s;
@@ -109,6 +113,7 @@ def delete_data(connection, cursor, table, column_name, expected_value):
     return True
 
 
+# Just random string with random length
 def random_string():
     random_str = ""
     for i in range(0, random.randint(5, 10)):
@@ -116,6 +121,7 @@ def random_string():
     return random_str
 
 
+# Get random value for some SQL type.
 # Unknown type => None
 def gen_random(type_v):
     switcher = {

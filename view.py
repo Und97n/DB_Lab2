@@ -5,10 +5,11 @@ import sys
 
 class View(object):
 
+    # This message is displayed on program start
     def print_hello_message(self):
         print("Hello. You can always type 'back' and 'exit', even if i don't say that. Enjoy.")
 
-    # start menu handler
+    # Print start menu entries
     def print_start_menu(self):
         print("\n::::::::::::::::::::::::::::::::::::::::")
         print("\t1: View Tables")
@@ -17,6 +18,7 @@ class View(object):
         print("\t4: Find in all tables by phraze")
         print("\t5: Exit")
 
+    # Print some data. Data - list of tuples(table). No columns names specified.
     def print_data(self, table_data, on_none_message=None):
         if table_data:
             x = PrettyTable()
@@ -26,6 +28,7 @@ class View(object):
         elif on_none_message:
             print(on_none_message)
 
+    # Print menu entries for selection of some column from column list
     def select_column_menu(self, table_name, columns):
         print("Select some field of table '", table_name, "':", sep="")
         counter = 1
@@ -33,6 +36,7 @@ class View(object):
             print("\t%d: %s" % (counter, column))
             counter += 1
 
+    # Like print data, but with printing column names. There are in first element of 'table_data'
     def print_table(self, table_data, on_none_message=None):
         if table_data:
             x = PrettyTable()
@@ -44,6 +48,9 @@ class View(object):
         elif on_none_message:
             print(on_none_message)
 
+    # Request some input from user. Validation can be done with list of valid cases or with lambda.
+    # 'back' and 'exit' are allways valid.
+    # 'exit' means exit from program
     # Very nice looking code
     def request_input(self,
                       message,
@@ -51,12 +58,8 @@ class View(object):
                       validator=None,
                       message_on_wrong="Wrong input, try again(or enter 'back'):"):
         if validator is None:
-            if valid_cases:
-                validator = lambda x: (any(x is s for s in valid_cases))
-            else:
-                validator = lambda _: True
+            validator = (lambda x: (any(x is s for s in valid_cases))) if valid_cases else (lambda _: True)
 
-        retval = None
         print(message, end=" ")
         while True:
             try:
@@ -75,20 +78,25 @@ class View(object):
             except Exception as e:
                 print("Error on input:", e)
 
-    # друкує меню з таблицями
+    # Print tables list (menu entries)
     def print_tables(self, tables_list):
         counter = 1
         for table in tables_list:
             print("\t", counter, ": ", table, sep="")
             counter += 1
 
+    # Print some message and call 'getch'.
+    # User may have some time to rest before menu loop will continue.
     def print_and_getch(self, message):
         print(message)
         return getch.getch()
 
+    # Print Ok if 'is_all_ok', else print 'FAIL'
+    # Then call 'getch'
     def after_action_message(self, is_all_ok):
         return self.print_and_getch("Ok" if is_all_ok else "FAIL")
 
+    # Print table actions menu entries
     def print_table_menu(self, table_name):
         print("TABLE:", table_name)
         print("\t1: Select all")
@@ -99,7 +107,7 @@ class View(object):
         print("\t6: Insert random data")
         print("\t7: Find")
 
-    # друкує find меню для таблиці
+    # Print find menu entries
     def find_menu(self):
         print("FIND MENU")
         print("\t1: Users, who used/not-used adblock at last session")
