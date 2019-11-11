@@ -14,7 +14,8 @@ class View(object):
         print("\t1: View Tables")
         print("\t2: SQL Query")
         print("\t3: Find some")
-        print("\t4: Exit")
+        print("\t4: Find in all tables by phraze")
+        print("\t5: Exit")
 
     def print_data(self, table_data, on_none_message=None):
         if table_data:
@@ -24,6 +25,13 @@ class View(object):
             print(x)
         elif on_none_message:
             print(on_none_message)
+
+    def select_column_menu(self, table_name, columns):
+        print("Select some field of table '", table_name, "':", sep="")
+        counter = 1
+        for column in columns:
+            print("\t%d: %s" % (counter, column))
+            counter += 1
 
     def print_table(self, table_data, on_none_message=None):
         if table_data:
@@ -46,7 +54,7 @@ class View(object):
             if valid_cases:
                 validator = lambda x: (any(x is s for s in valid_cases))
             else:
-                validator = lambda x: True
+                validator = lambda _: True
 
         retval = None
         print(message, end=" ")

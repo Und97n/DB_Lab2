@@ -71,6 +71,29 @@ def insert_data(connection, cursor, table, data):
     return True
 
 
+def update_item(connection, cursor, table_name, column_to_check, expected_value, new_data):
+    columns = list_table_columns(cursor, table_name)
+    insert_str = ""
+    for i in range(0, len(columns)):
+        # '' means default value
+        if new_data[i] != '':
+            if insert_str != "":
+                insert_str += ', '
+            insert_str += "%s='%s'" % (columns[i], new_data[i])
+
+    q = sql.SQL("""
+    UPDATE {} SET """ + insert_str + """ WHERE {}=%s;
+    """).format(sql.Identifier(table_name), sql.Identifier(column_to_check))
+
+    try:
+        cursor.execute(q, (expected_value, ))
+        connection.commit()
+    except BaseException as e:
+        print("ERROR: ", str(e))
+        return False
+    return True
+
+
 # Insert some data to table. NO CHECKS!!!
 def delete_data(connection, cursor, table, column_name, expected_value):
     q = sql.SQL("""

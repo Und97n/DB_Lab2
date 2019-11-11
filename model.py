@@ -17,10 +17,39 @@ class Model(object):
                 if data:
                     return [utils.list_table_columns(cursor, table_name), data]
 
+    def update(self, table_name, column_to_check, exp_value, new_data):
+        with self.open_connection() as conn:
+            with conn.cursor() as cursor:
+                return utils.update_item(conn, cursor, table_name, column_to_check, exp_value, new_data)
+
+    def find_by_phraze(self, table_name, phraze):
+        with self.open_connection() as conn:
+            with conn.cursor() as cursor:
+                def find_by_phraze(column):
+                    return val
+
+                columns = utils.list_table_columns(cursor, table_name)
+                columns = list(filter((lambda x: utils.get_column_type(cursor, table_name, x) == 'text'), columns))
+                data = []
+                for column in columns:
+                    val = utils.query(cursor, sql.SQL("""
+                    SELECT * FROM {} WHERE {} LIKE %s;
+                    """).format(sql.Identifier(table_name), sql.Identifier(column)),
+                      ("%{}%".format(phraze),))
+                    if val:
+                        data.extend(val)
+                if data:
+                    return [utils.list_table_columns(cursor, table_name), list(dict.fromkeys(data))]
+
     def list_tables(self):
         with self.open_connection() as conn:
             with conn.cursor() as cursor:
                 return utils.list_tables(cursor)
+
+    def list_columns(self, table_name):
+        with self.open_connection() as conn:
+            with conn.cursor() as cursor:
+                return utils.list_table_columns(cursor, table_name)
 
     def get_full_table(self, table_name):
         with self.open_connection() as conn:
